@@ -316,6 +316,124 @@
     }
   }
 
+  // ─── Voice Callouts ──────────────────────────────────────────────
+  // Random encouraging shouts that appear as floating text with a cheerful sound
+
+  const CALLOUT_LINES = [
+    'Go Elin!',
+    'Elin, go for it!',
+    'Elin watch the hedgehog!',
+    'You can do it Elin!',
+    'Wooo Elin!',
+    'Pedal power!',
+    'Watch out!',
+    'Nice one Elin!',
+    'Keep going!',
+    'Elin you legend!',
+    'Faster Elin!',
+    'Mind the granny!',
+    'Elin for the win!',
+  ];
+
+  let activeCallouts = []; // {text, x, y, life, maxLife, color}
+  let lastCalloutFrame = 0;
+  const CALLOUT_COOLDOWN = 720; // minimum ~12 seconds between callouts at 60fps
+  const CALLOUT_CHANCE = 0.012; // checked each frame after cooldown — roughly once per 15-20s
+
+  function playCalloutSound() {
+    if (!audioCtx) return;
+    // Cheerful, enthusiastic shout — rising pitched babble with emphasis
+    const now = audioCtx.currentTime;
+    const notes = [
+      { f: 400, d: 0.07 }, { f: 520, d: 0.06 }, { f: 620, d: 0.08 },
+      { f: 700, d: 0.10 },
+    ];
+    let t = now;
+    for (const n of notes) {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(n.f + Math.random() * 60, t);
+      o.frequency.linearRampToValueAtTime(n.f * 1.15, t + n.d * 0.6);
+      o.frequency.linearRampToValueAtTime(n.f * 0.9, t + n.d);
+      g.gain.setValueAtTime(0.06, t);
+      g.gain.linearRampToValueAtTime(0.08, t + n.d * 0.3);
+      g.gain.exponentialRampToValueAtTime(0.001, t + n.d + 0.02);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t);
+      o.stop(t + n.d + 0.02);
+      t += n.d + 0.02;
+    }
+  }
+
+  function triggerCallout() {
+    // Pick a contextual line — prefer hedgehog/granny lines when those are on-screen
+    let line;
+    const hedgehogNearby = obstacles.some(o => o.type === 'hedgehog' && o.x > 100 && o.x < W);
+    const grannyNearby = obstacles.some(o => o.type === 'oldperson' && o.x > 100 && o.x < W);
+    if (hedgehogNearby && Math.random() < 0.5) {
+      line = 'Elin watch the hedgehog!';
+    } else if (grannyNearby && Math.random() < 0.4) {
+      line = 'Mind the granny!';
+    } else {
+      line = CALLOUT_LINES[Math.floor(Math.random() * CALLOUT_LINES.length)];
+    }
+
+    const colors = ['#ff6b9d', '#ffcc00', '#6bffb8', '#ff9f43', '#a29bfe', '#fd79a8'];
+    activeCallouts.push({
+      text: line,
+      x: 60 + Math.random() * (W - 200),
+      y: 40 + Math.random() * 60,
+      life: 0,
+      maxLife: 120, // ~2 seconds
+      color: colors[Math.floor(Math.random() * colors.length)],
+    });
+    lastCalloutFrame = frameCount;
+    playCalloutSound();
+  }
+
+  function updateCallouts() {
+    for (let i = activeCallouts.length - 1; i >= 0; i--) {
+      activeCallouts[i].life++;
+      if (activeCallouts[i].life >= activeCallouts[i].maxLife) {
+        activeCallouts.splice(i, 1);
+      }
+    }
+  }
+
+  function drawCallouts() {
+    for (const c of activeCallouts) {
+      const progress = c.life / c.maxLife;
+      // Float upward gently
+      const drawY = c.y - progress * 30;
+      // Fade in quickly, hold, then fade out
+      let alpha;
+      if (progress < 0.1) alpha = progress / 0.1;
+      else if (progress > 0.75) alpha = (1 - progress) / 0.25;
+      else alpha = 1;
+      // Slight bounce-in scale
+      const scaleAmt = progress < 0.1 ? 0.8 + 0.2 * (progress / 0.1) : 1;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(c.x, drawY);
+      ctx.scale(scaleAmt, scaleAmt);
+
+      // Text outline for readability
+      ctx.font = 'bold 14px monospace';
+      ctx.textAlign = 'center';
+      ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(c.text, 0, 0);
+      ctx.fillStyle = c.color;
+      ctx.fillText(c.text, 0, 0);
+
+      ctx.restore();
+    }
+  }
+
   // ─── Music — punchy chiptune with drums ────────────────────────────
   let musicInterval = null;
   let drumInterval = null;
@@ -1788,6 +1906,8 @@
     coinItems = [];
     animals = [];
     lastCharSoundFrame = 0;
+    activeCallouts = [];
+    lastCalloutFrame = 0;
     malis = [];
     particles = [];
     speedLines = [];
@@ -2089,6 +2209,12 @@
       }
     }
 
+    // Voice callouts — occasional encouraging shouts
+    updateCallouts();
+    if (frameCount - lastCalloutFrame > CALLOUT_COOLDOWN && Math.random() < CALLOUT_CHANCE) {
+      triggerCallout();
+    }
+
     // Babble
     if (frameCount - lastBabbleTime > 500 + Math.random() * 400) {
       playBabble();
@@ -2162,6 +2288,9 @@
 
     // Particles (on top)
     drawParticles();
+
+    // Voice callouts (floating text)
+    drawCallouts();
 
     // Vignette overlay
     const vig = ctx.createRadialGradient(W / 2, H / 2, W * 0.3, W / 2, H / 2, W * 0.75);
