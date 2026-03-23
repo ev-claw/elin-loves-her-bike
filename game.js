@@ -154,6 +154,40 @@
     }
   }
 
+  function playSqueakSound() {
+    if (!audioCtx) return;
+    // Playful high-pitched squeaky voice — two rapid squeaks
+    const now = audioCtx.currentTime;
+    for (let i = 0; i < 2; i++) {
+      const t = now + i * 0.15;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(1200 + Math.random() * 200, t);
+      o.frequency.exponentialRampToValueAtTime(1800 + Math.random() * 300, t + 0.06);
+      o.frequency.exponentialRampToValueAtTime(900 + Math.random() * 100, t + 0.1);
+      g.gain.setValueAtTime(0.09, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t);
+      o.stop(t + 0.12);
+    }
+    // Third chirpy squeak
+    const o2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(1600, now + 0.32);
+    o2.frequency.exponentialRampToValueAtTime(2200, now + 0.38);
+    o2.frequency.exponentialRampToValueAtTime(1000, now + 0.44);
+    g2.gain.setValueAtTime(0.07, now + 0.32);
+    g2.gain.exponentialRampToValueAtTime(0.001, now + 0.46);
+    o2.connect(g2);
+    g2.connect(audioCtx.destination);
+    o2.start(now + 0.32);
+    o2.stop(now + 0.46);
+  }
+
   // ─── Music — punchy chiptune with drums ────────────────────────────
   let musicInterval = null;
   let drumInterval = null;
@@ -319,6 +353,7 @@
   let clouds = [];
   let buildings = [];
   let animals = [];
+  let malis = [];
   let foregroundItems = [];
   let speedLines = [];
   let farHills = [];
@@ -1370,6 +1405,148 @@
     drawRect(x + 8, y - 12, 10, 2, '#e74c3c');
   }
 
+  function drawMali(x, y, squeakTimer) {
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 1, 10, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Legs
+    drawRect(x - 4, y - 6, 4, 7, '#e8b88a');
+    drawRect(x + 2, y - 6, 4, 7, '#e8b88a');
+    // Shoes
+    drawRect(x - 5, y - 2, 5, 3, '#e74c3c');
+    drawRect(x + 1, y - 2, 5, 3, '#e74c3c');
+    // Body — cute purple dress
+    ctx.fillStyle = '#9b59b6';
+    ctx.beginPath();
+    ctx.moveTo(x - 8, y - 18);
+    ctx.lineTo(x + 8, y - 18);
+    ctx.lineTo(x + 10, y - 6);
+    ctx.lineTo(x - 10, y - 6);
+    ctx.closePath();
+    ctx.fill();
+    // Dress pattern — white dots
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    drawCircle(x - 3, y - 14, 1, 'rgba(255,255,255,0.4)');
+    drawCircle(x + 3, y - 10, 1, 'rgba(255,255,255,0.4)');
+    drawCircle(x - 1, y - 8, 1, 'rgba(255,255,255,0.4)');
+    // Arms
+    ctx.strokeStyle = '#e8b88a';
+    ctx.lineWidth = 2.5;
+    const wave = Math.sin(frameCount * 0.15) * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(x - 7, y - 16);
+    ctx.lineTo(x - 13, y - 10 + wave * 5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + 7, y - 16);
+    ctx.lineTo(x + 13, y - 10 - wave * 5);
+    ctx.stroke();
+    // Head
+    drawCircle(x, y - 24, 8, '#f0c8a0');
+    // Rosy cheeks
+    drawCircle(x - 5, y - 22, 2, 'rgba(255,130,130,0.35)');
+    drawCircle(x + 5, y - 22, 2, 'rgba(255,130,130,0.35)');
+    // Eyes — big and expressive
+    drawCircle(x - 3, y - 25, 2.2, '#fff');
+    drawCircle(x + 3, y - 25, 2.2, '#fff');
+    drawCircle(x - 3, y - 25, 1.3, '#5a3825');
+    drawCircle(x + 3, y - 25, 1.3, '#5a3825');
+    drawCircle(x - 2.6, y - 25.3, 0.5, '#fff');
+    drawCircle(x + 3.4, y - 25.3, 0.5, '#fff');
+    // Happy mouth
+    ctx.strokeStyle = '#c0392b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x, y - 21, 3, 0.1, Math.PI - 0.1);
+    ctx.stroke();
+    // Hair — dark brown pigtails
+    drawCircle(x, y - 30, 5, '#5a3825');
+    drawCircle(x - 2, y - 31, 4, '#5a3825');
+    drawCircle(x + 2, y - 31, 4, '#5a3825');
+    // Pigtails
+    ctx.strokeStyle = '#5a3825';
+    ctx.lineWidth = 3;
+    const pigtailWave = Math.sin(frameCount * 0.08) * 2;
+    ctx.beginPath();
+    ctx.moveTo(x - 6, y - 28);
+    ctx.quadraticCurveTo(x - 14, y - 26 + pigtailWave, x - 12, y - 18);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + 6, y - 28);
+    ctx.quadraticCurveTo(x + 14, y - 26 - pigtailWave, x + 12, y - 18);
+    ctx.stroke();
+    // Hair bows — pink
+    drawCircle(x - 10, y - 22, 2.5, '#ff69b4');
+    drawCircle(x + 10, y - 22, 2.5, '#ff69b4');
+
+    // Speech bubble when squeaking
+    if (squeakTimer > 0) {
+      const alpha = Math.min(1, squeakTimer / 20);
+      const bubbleX = x + 18;
+      const bubbleY = y - 52;
+      const bubbleW = 108;
+      const bubbleH = 22;
+      const bounce = Math.sin(squeakTimer * 0.3) * 1.5;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Bubble background
+      ctx.fillStyle = '#fff';
+      ctx.strokeStyle = '#9b59b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bubbleX - bubbleW / 2 + 6, bubbleY - bubbleH / 2 + bounce);
+      ctx.lineTo(bubbleX + bubbleW / 2 - 6, bubbleY - bubbleH / 2 + bounce);
+      ctx.quadraticCurveTo(bubbleX + bubbleW / 2, bubbleY - bubbleH / 2 + bounce, bubbleX + bubbleW / 2, bubbleY - bubbleH / 2 + 6 + bounce);
+      ctx.lineTo(bubbleX + bubbleW / 2, bubbleY + bubbleH / 2 - 6 + bounce);
+      ctx.quadraticCurveTo(bubbleX + bubbleW / 2, bubbleY + bubbleH / 2 + bounce, bubbleX + bubbleW / 2 - 6, bubbleY + bubbleH / 2 + bounce);
+      ctx.lineTo(bubbleX - bubbleW / 2 + 6, bubbleY + bubbleH / 2 + bounce);
+      ctx.quadraticCurveTo(bubbleX - bubbleW / 2, bubbleY + bubbleH / 2 + bounce, bubbleX - bubbleW / 2, bubbleY + bubbleH / 2 - 6 + bounce);
+      ctx.lineTo(bubbleX - bubbleW / 2, bubbleY - bubbleH / 2 + 6 + bounce);
+      ctx.quadraticCurveTo(bubbleX - bubbleW / 2, bubbleY - bubbleH / 2 + bounce, bubbleX - bubbleW / 2 + 6, bubbleY - bubbleH / 2 + bounce);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Tail pointing down to Mali
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.moveTo(bubbleX - 12, bubbleY + bubbleH / 2 + bounce);
+      ctx.lineTo(bubbleX - 6, bubbleY + bubbleH / 2 + 8 + bounce);
+      ctx.lineTo(bubbleX - 2, bubbleY + bubbleH / 2 + bounce);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#9b59b6';
+      ctx.beginPath();
+      ctx.moveTo(bubbleX - 12, bubbleY + bubbleH / 2 + bounce);
+      ctx.lineTo(bubbleX - 6, bubbleY + bubbleH / 2 + 8 + bounce);
+      ctx.lineTo(bubbleX - 2, bubbleY + bubbleH / 2 + bounce);
+      ctx.stroke();
+
+      // Text
+      ctx.fillStyle = '#9b59b6';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Mali Squeak Squeak', bubbleX, bubbleY + 4 + bounce);
+      ctx.textAlign = 'left';
+
+      ctx.restore();
+    }
+  }
+
+  function spawnMali() {
+    malis.push({
+      x: W + 40,
+      y: GROUND_Y,
+      squeakTimer: 0,
+      squeakCooldown: 60 + Math.floor(Math.random() * 80),
+      hasSqueaked: false,
+    });
+  }
+
   function drawCoin(x, y, bobOffset) {
     const cy = y + Math.sin(frameCount * 0.08 + bobOffset) * 5;
     // Glow
@@ -1478,6 +1655,7 @@
     obstacles = [];
     coinItems = [];
     animals = [];
+    malis = [];
     particles = [];
     speedLines = [];
     initScenery();
@@ -1666,6 +1844,27 @@
     // Spawn animals
     if (frameCount % 280 === 0) spawnAnimal();
 
+    // Spawn Mali occasionally (every ~8-14 seconds)
+    if (frameCount % 600 === 200 && Math.random() < 0.55) spawnMali();
+
+    // Move & update Mali
+    for (let i = malis.length - 1; i >= 0; i--) {
+      malis[i].x -= speed * 0.5;
+      if (malis[i].squeakCooldown > 0) {
+        malis[i].squeakCooldown--;
+      } else if (!malis[i].hasSqueaked && malis[i].x < W - 50 && malis[i].x > 50) {
+        malis[i].squeakTimer = 120;
+        malis[i].hasSqueaked = true;
+        playSqueakSound();
+        // Squeak particles — little pink stars
+        spawnParticles(malis[i].x, malis[i].y - 40, 6, '#ff69b4', {
+          speed: 2, upward: 1.5, life: 25, gravity: 0.02, type: 'star', size: 2,
+        });
+      }
+      if (malis[i].squeakTimer > 0) malis[i].squeakTimer--;
+      if (malis[i].x < -60) malis.splice(i, 1);
+    }
+
     // Move obstacles
     for (let i = obstacles.length - 1; i >= 0; i--) {
       obstacles[i].x -= speed;
@@ -1785,6 +1984,11 @@
     for (const a of animals) {
       if (a.type === 'cat') drawCat(a.x, a.y);
       else drawDog(a.x, a.y);
+    }
+
+    // Mali
+    for (const m of malis) {
+      drawMali(m.x, m.y, m.squeakTimer);
     }
 
     // Coins
