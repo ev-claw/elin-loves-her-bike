@@ -280,7 +280,7 @@
   let coins = 0;
   let distance = 0;
   let lives = 3;
-  let speed = 4;
+  let speed = 3.2;
   let frameCount = 0;
   let invincibleTimer = 0;
   let lastBabbleTime = 0;
@@ -1462,7 +1462,7 @@
     coins = 0;
     distance = 0;
     lives = 3;
-    speed = 4;
+    speed = 3.2;
     frameCount = 0;
     invincibleTimer = 0;
     difficultyTimer = 0;
@@ -1570,7 +1570,7 @@
     } else {
       comboCountEl.style.opacity = '0';
     }
-    const pct = Math.min(100, ((speed - 4) / 5) * 100);
+    const pct = Math.min(100, ((speed - 3.2) / 3.8) * 100);
     speedFillEl.style.width = pct + '%';
   }
 
@@ -1593,8 +1593,8 @@
     }
 
     // Speed ramp
-    if (difficultyTimer % 500 === 0 && speed < 9) {
-      speed += 0.2;
+    if (difficultyTimer % 600 === 0 && speed < 7) {
+      speed += 0.15;
     }
 
     // Combo decay
