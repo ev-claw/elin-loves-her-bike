@@ -1466,6 +1466,10 @@
   // ─── Obstacle Drawing ─────────────────────────────────────────────
 
   function drawHedgehog(x, y) {
+    ctx.save();
+    ctx.translate(x, 0);
+    ctx.scale(-1, 1);
+    ctx.translate(-x, 0);
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
@@ -1495,9 +1499,14 @@
     const legOff = Math.sin(frameCount * 0.2) * 2;
     drawRect(x - 6, y - 1 + legOff, 4, 3, '#8B6914');
     drawRect(x + 3, y - 1 - legOff, 4, 3, '#8B6914');
+    ctx.restore();
   }
 
   function drawOldPerson(x, y) {
+    ctx.save();
+    ctx.translate(x, 0);
+    ctx.scale(-1, 1);
+    ctx.translate(-x, 0);
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.12)';
     ctx.beginPath();
@@ -1550,9 +1559,14 @@
     ctx.beginPath();
     ctx.arc(x - 5.5, y - 24, 3, Math.PI, 0);
     ctx.stroke();
+    ctx.restore();
   }
 
   function drawRat(x, y) {
+    ctx.save();
+    ctx.translate(x, 0);
+    ctx.scale(-1, 1);
+    ctx.translate(-x, 0);
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.12)';
     ctx.beginPath();
@@ -1592,6 +1606,7 @@
     const legAnim = Math.sin(frameCount * 0.25) * 2;
     drawRect(x - 5, y - 1 + legAnim, 3, 3, '#555');
     drawRect(x + 4, y - 1 - legAnim, 3, 3, '#555');
+    ctx.restore();
   }
 
   function drawCat(x, y) {
