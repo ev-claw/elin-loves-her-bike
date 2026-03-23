@@ -11,7 +11,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #1a1a2e;
+  background: #0a0a1a;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   touch-action: none;
 }
@@ -23,18 +23,18 @@ html, body {
   image-rendering: pixelated;
 }
 
-/* Start Screen Overlay */
+/* ── Start Screen ────────────────────────────────────────────── */
+
 #startScreen {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   z-index: 100;
-  transition: opacity 0.5s;
+  transition: opacity 0.6s ease-out;
+  overflow: hidden;
 }
 
 #startScreen.hidden {
@@ -42,100 +42,203 @@ html, body {
   pointer-events: none;
 }
 
-#startScreen h1 {
-  font-size: clamp(2rem, 8vw, 4.5rem);
-  color: #fff;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-  margin-bottom: 0.2em;
+.title-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(102,126,234,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(118,75,162,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,107,107,0.15) 0%, transparent 70%),
+    linear-gradient(160deg, #1a0a2e 0%, #16213e 40%, #0f3460 100%);
+  animation: bgPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  0% { filter: brightness(1) hue-rotate(0deg); }
+  100% { filter: brightness(1.15) hue-rotate(10deg); }
+}
+
+.title-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  line-height: 1.1;
+  padding: 0 1.5em;
+}
+
+.title-badge {
+  font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin-bottom: 0.8em;
+}
+
+#startScreen h1 {
+  font-size: clamp(2.4rem, 9vw, 5.5rem);
+  color: #fff;
+  text-shadow:
+    0 0 30px rgba(102,126,234,0.6),
+    0 4px 0 rgba(0,0,0,0.3),
+    0 0 60px rgba(118,75,162,0.3);
+  margin-bottom: 0.15em;
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.title-accent {
+  background: linear-gradient(90deg, #ff6b6b, #ffd700, #ff6b6b);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 #startScreen .subtitle {
-  font-size: clamp(0.9rem, 3vw, 1.4rem);
-  color: rgba(255,255,255,0.85);
-  margin-bottom: 2em;
-  text-align: center;
-  padding: 0 1em;
-}
-
-#startScreen .bike-art {
-  font-size: clamp(3rem, 12vw, 6rem);
-  margin-bottom: 0.5em;
+  font-size: clamp(0.85rem, 2.8vw, 1.3rem);
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 1.8em;
+  font-weight: 300;
 }
 
 #startBtn {
-  font-size: clamp(1.2rem, 4vw, 1.8rem);
-  padding: 0.7em 2.5em;
+  font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+  padding: 0.75em 2.8em;
   border: none;
   border-radius: 50px;
-  background: #ff6b6b;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
   color: #fff;
-  font-weight: bold;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow:
+    0 4px 20px rgba(255,107,107,0.4),
+    0 0 40px rgba(255,107,107,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.2);
   transition: transform 0.15s, box-shadow 0.15s;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
 }
 
 #startBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  transform: scale(1.06) translateY(-2px);
+  box-shadow:
+    0 8px 30px rgba(255,107,107,0.5),
+    0 0 60px rgba(255,107,107,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 #startBtn:active {
   transform: scale(0.97);
 }
 
-.instructions {
-  margin-top: 1.5em;
-  color: rgba(255,255,255,0.7);
-  font-size: clamp(0.75rem, 2.5vw, 1rem);
-  text-align: center;
-  line-height: 1.6;
-  padding: 0 1.5em;
+.btn-icon {
+  font-size: 0.8em;
 }
 
-/* HUD */
+.instructions {
+  margin-top: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.ctrl-hint {
+  color: rgba(255,255,255,0.45);
+  font-size: clamp(0.7rem, 2.2vw, 0.9rem);
+  line-height: 1.4;
+}
+
+.hi-score {
+  margin-top: 1.5em;
+  color: #ffd700;
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+/* ── HUD ─────────────────────────────────────────────────────── */
+
 #hud {
   position: fixed;
   top: 0; left: 0; right: 0;
   display: none;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
+  padding: 8px 14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 80%, transparent 100%);
   z-index: 50;
-  font-size: clamp(0.9rem, 3vw, 1.2rem);
+  font-size: clamp(0.85rem, 2.8vw, 1.15rem);
   color: #fff;
-  font-weight: bold;
+  font-weight: 700;
+  gap: 8px;
 }
 
 #hud.active {
   display: flex;
 }
 
-#hud .coins {
-  color: #ffd700;
+.hud-left, .hud-center, .hud-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-#hud .distance {
-  color: #a8e6cf;
+.hud-center {
+  flex-direction: column;
+  gap: 2px;
 }
 
-#hud .lives {
-  color: #ff6b6b;
+.hud-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* Mobile Controls */
+.hud-icon {
+  font-size: 1.1em;
+}
+
+#hud .coins { color: #ffd700; }
+#hud .distance { color: #a8e6cf; font-size: 0.9em; }
+#hud .lives { color: #ff6b6b; letter-spacing: 2px; }
+#hud .combo { color: #ff9f43; font-size: 0.85em; }
+
+.speed-bar {
+  width: clamp(60px, 15vw, 100px);
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.speed-fill {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #a8e6cf, #ff6b6b);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+/* ── Mobile Controls ─────────────────────────────────────────── */
+
 #mobileControls {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   display: none;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 12px 16px 24px;
+  padding: 12px 16px 28px;
   z-index: 50;
   pointer-events: none;
 }
@@ -145,25 +248,48 @@ html, body {
 }
 
 .ctrl-btn {
-  width: clamp(56px, 15vw, 80px);
-  height: clamp(56px, 15vw, 80px);
-  border-radius: 50%;
-  border: 3px solid rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(4px);
+  width: clamp(64px, 16vw, 88px);
+  height: clamp(64px, 16vw, 88px);
+  border-radius: 18px;
+  border: 2px solid rgba(255,255,255,0.35);
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
   color: #fff;
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   pointer-events: auto;
   cursor: pointer;
-  transition: background 0.1s;
+  transition: background 0.1s, transform 0.1s, border-color 0.1s;
+  gap: 2px;
+}
+
+.ctrl-label {
+  font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.ctrl-arrow {
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
 }
 
 .ctrl-btn:active, .ctrl-btn.pressed {
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.25);
   border-color: #fff;
+  transform: scale(0.93);
+}
+
+.ctrl-jump:active, .ctrl-jump.pressed {
+  border-color: #a8e6cf;
+  box-shadow: 0 0 20px rgba(168,230,207,0.3);
+}
+
+.ctrl-duck:active, .ctrl-duck.pressed {
+  border-color: #74b9ff;
+  box-shadow: 0 0 20px rgba(116,185,255,0.3);
 }
 
 .ctrl-left {
@@ -171,17 +297,17 @@ html, body {
   gap: 10px;
 }
 
-/* Game Over Overlay */
+/* ── Game Over ───────────────────────────────────────────────── */
+
 #gameOver {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
   display: none;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
   z-index: 100;
   color: #fff;
 }
@@ -190,60 +316,74 @@ html, body {
   display: flex;
 }
 
-#gameOver h2 {
-  font-size: clamp(2rem, 7vw, 3.5rem);
-  margin-bottom: 0.3em;
-  color: #ff6b6b;
+.go-panel {
+  text-align: center;
+  padding: 2em;
+  max-width: 400px;
+  width: 90%;
 }
 
-#gameOver .final-score {
-  font-size: clamp(1rem, 3.5vw, 1.5rem);
-  margin-bottom: 0.3em;
+#gameOver h2 {
+  font-size: clamp(2.2rem, 8vw, 4rem);
+  margin-bottom: 0.4em;
+  background: linear-gradient(180deg, #ff6b6b, #c0392b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+}
+
+.go-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(1em, 4vw, 2em);
+  margin-bottom: 1em;
+}
+
+.go-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.go-stat-label {
+  font-size: clamp(0.65rem, 2vw, 0.8rem);
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.go-stat-val {
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  font-weight: 800;
   color: #ffd700;
 }
 
-#gameOver .final-distance {
+.go-rank {
   font-size: clamp(0.9rem, 3vw, 1.2rem);
-  margin-bottom: 1.5em;
   color: #a8e6cf;
+  margin-bottom: 1.5em;
+  min-height: 1.5em;
 }
 
 #restartBtn {
-  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  font-size: clamp(1rem, 3.2vw, 1.4rem);
   padding: 0.7em 2.5em;
   border: none;
   border-radius: 50px;
-  background: #ff6b6b;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
   color: #fff;
-  font-weight: bold;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(255,107,107,0.4);
   transition: transform 0.15s;
+  letter-spacing: 0.05em;
+}
+
+#restartBtn:hover {
+  transform: scale(1.05);
 }
 
 #restartBtn:active {
   transform: scale(0.97);
-}
-
-/* Pause button */
-#pauseBtn {
-  position: fixed;
-  top: 10px;
-  right: 16px;
-  z-index: 60;
-  display: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.5);
-  background: rgba(0,0,0,0.3);
-  color: #fff;
-  font-size: 1.1rem;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-#pauseBtn.active {
-  display: flex;
 }

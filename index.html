@@ -13,22 +13,41 @@
 
   <!-- Start Screen -->
   <div id="startScreen">
-    <div class="bike-art">🚲</div>
-    <h1>Elin's Bike Game</h1>
-    <p class="subtitle">Ride through London on a tiny-wheeled electric bike!</p>
-    <button id="startBtn">RIDE!</button>
-    <div class="instructions">
-      <strong>Desktop:</strong> Space / Up = Jump &middot; Down = Duck<br>
-      <strong>Mobile:</strong> Use on-screen buttons<br>
-      Dodge hedgehogs, grannies &amp; rats! Collect coins!
+    <div class="title-bg"></div>
+    <div class="title-content">
+      <div class="title-badge">PRESENTS</div>
+      <h1>Elin's<br><span class="title-accent">Bike Game</span></h1>
+      <p class="subtitle">Race through London on a tiny-wheeled electric bike!</p>
+      <button id="startBtn">
+        <span class="btn-icon">&#9654;</span> RIDE!
+      </button>
+      <div class="instructions">
+        <div class="ctrl-hint"><strong>Desktop:</strong> Space / Up = Jump &middot; Down = Duck</div>
+        <div class="ctrl-hint"><strong>Mobile:</strong> Use on-screen buttons</div>
+        <div class="ctrl-hint">Dodge hedgehogs, grannies &amp; rats! Collect coins!</div>
+      </div>
+      <div class="hi-score" id="hiScoreDisplay"></div>
     </div>
   </div>
 
   <!-- HUD -->
   <div id="hud">
-    <span class="coins" id="coinCount">&#x1FA99; 0</span>
-    <span class="distance" id="distCount">0m</span>
-    <span class="lives" id="livesCount">&#10084; 3</span>
+    <div class="hud-left">
+      <span class="hud-item coins" id="coinCount">
+        <span class="hud-icon">&#x1FA99;</span>
+        <span class="hud-val">0</span>
+      </span>
+      <span class="hud-item combo" id="comboCount"></span>
+    </div>
+    <div class="hud-center">
+      <span class="hud-item distance" id="distCount">0m</span>
+      <div class="speed-bar" id="speedBar">
+        <div class="speed-fill" id="speedFill"></div>
+      </div>
+    </div>
+    <div class="hud-right">
+      <span class="hud-item lives" id="livesCount"></span>
+    </div>
   </div>
 
   <!-- Game Canvas -->
@@ -37,17 +56,38 @@
   <!-- Mobile Controls -->
   <div id="mobileControls">
     <div class="ctrl-left">
-      <button class="ctrl-btn" id="btnDuck">&#8595;</button>
+      <button class="ctrl-btn ctrl-duck" id="btnDuck">
+        <span class="ctrl-label">DUCK</span>
+        <span class="ctrl-arrow">&#8595;</span>
+      </button>
     </div>
-    <button class="ctrl-btn" id="btnJump">&#8593;</button>
+    <button class="ctrl-btn ctrl-jump" id="btnJump">
+      <span class="ctrl-label">JUMP</span>
+      <span class="ctrl-arrow">&#8593;</span>
+    </button>
   </div>
 
   <!-- Game Over -->
   <div id="gameOver">
-    <h2>Game Over!</h2>
-    <div class="final-score" id="finalScore">Coins: 0</div>
-    <div class="final-distance" id="finalDist">Distance: 0m</div>
-    <button id="restartBtn">Ride Again!</button>
+    <div class="go-panel">
+      <h2>Game Over!</h2>
+      <div class="go-stats">
+        <div class="go-stat">
+          <span class="go-stat-label">Coins</span>
+          <span class="go-stat-val" id="finalScore">0</span>
+        </div>
+        <div class="go-stat">
+          <span class="go-stat-label">Distance</span>
+          <span class="go-stat-val" id="finalDist">0m</span>
+        </div>
+        <div class="go-stat">
+          <span class="go-stat-label">Best</span>
+          <span class="go-stat-val" id="finalBest">0</span>
+        </div>
+      </div>
+      <div class="go-rank" id="goRank"></div>
+      <button id="restartBtn">Ride Again!</button>
+    </div>
   </div>
 
   <script src="game.js"></script>
