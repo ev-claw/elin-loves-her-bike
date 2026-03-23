@@ -340,6 +340,35 @@
   const CALLOUT_COOLDOWN = 720; // minimum ~12 seconds between callouts at 60fps
   const CALLOUT_CHANCE = 0.012; // checked each frame after cooldown — roughly once per 15-20s
 
+  // ─── Spoken Callouts (Web Speech Synthesis) ────────────────────────
+  // Speaks the callout line aloud using the browser's speech synthesis.
+  // Graceful fallback: if speech synthesis is unavailable, we just skip it.
+
+  let speechReady = false;
+  if ('speechSynthesis' in window) {
+    // Voices load asynchronously on many browsers — mark ready once loaded
+    speechReady = speechSynthesis.getVoices().length > 0;
+    speechSynthesis.addEventListener('voiceschanged', () => { speechReady = true; });
+  }
+
+  function speakCallout(text) {
+    if (!('speechSynthesis' in window)) return;
+    // Don't queue up speech — cancel any in-progress utterance
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    // Pick a friendly voice if available
+    const voices = speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      // Prefer an English voice; pick the first en- voice, or fallback to default
+      const enVoice = voices.find(v => /^en[-_]/i.test(v.lang));
+      if (enVoice) utt.voice = enVoice;
+    }
+    utt.rate = 1.15;    // Slightly upbeat pace
+    utt.pitch = 1.3;    // Cheerful, higher pitch
+    utt.volume = 0.8;   // Not too loud — complement the game audio
+    speechSynthesis.speak(utt);
+  }
+
   function playCalloutSound() {
     if (!audioCtx) return;
     // Cheerful, enthusiastic shout — rising pitched babble with emphasis
@@ -391,6 +420,7 @@
     });
     lastCalloutFrame = frameCount;
     playCalloutSound();
+    speakCallout(line);
   }
 
   function updateCallouts() {
