@@ -1610,6 +1610,10 @@
   }
 
   function drawCat(x, y) {
+    ctx.save();
+    ctx.translate(x, 0);
+    ctx.scale(-1, 1);
+    ctx.translate(-x, 0);
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.1)';
     ctx.beginPath();
@@ -1652,6 +1656,7 @@
     // Legs
     drawRect(x - 6, y - 2, 3, 4, '#e17055');
     drawRect(x + 5, y - 2, 3, 4, '#e17055');
+    ctx.restore();
   }
 
   function drawDog(x, y) {
