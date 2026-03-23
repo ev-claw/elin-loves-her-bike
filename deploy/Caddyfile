@@ -1,0 +1,4 @@
+elin-loves-her-bike.r3x.io {
+    reverse_proxy localhost:8290
+    encode gzip
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Elin's Bike Game</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>">
+</head>
+<body>
+
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <div class="bike-art">🚲</div>
+    <h1>Elin's Bike Game</h1>
+    <p class="subtitle">Ride through London on a tiny-wheeled electric bike!</p>
+    <button id="startBtn">RIDE!</button>
+    <div class="instructions">
+      <strong>Desktop:</strong> Space / Up = Jump &middot; Down = Duck<br>
+      <strong>Mobile:</strong> Use on-screen buttons<br>
+      Dodge hedgehogs, grannies &amp; rats! Collect coins!
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <span class="coins" id="coinCount">&#x1FA99; 0</span>
+    <span class="distance" id="distCount">0m</span>
+    <span class="lives" id="livesCount">&#10084; 3</span>
+  </div>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Mobile Controls -->
+  <div id="mobileControls">
+    <div class="ctrl-left">
+      <button class="ctrl-btn" id="btnDuck">&#8595;</button>
+    </div>
+    <button class="ctrl-btn" id="btnJump">&#8593;</button>
+  </div>
+
+  <!-- Game Over -->
+  <div id="gameOver">
+    <h2>Game Over!</h2>
+    <div class="final-score" id="finalScore">Coins: 0</div>
+    <div class="final-distance" id="finalDist">Distance: 0m</div>
+    <button id="restartBtn">Ride Again!</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

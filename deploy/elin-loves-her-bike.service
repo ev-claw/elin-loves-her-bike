@@ -1,0 +1,16 @@
+[Unit]
+Description=Elin's Bike Game
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/elin-loves-her-bike
+ExecStart=/usr/bin/node /opt/elin-loves-her-bike/server.js
+Environment=PORT=8290
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

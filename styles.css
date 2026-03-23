@@ -1,0 +1,249 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1a2e;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  touch-action: none;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* Start Screen Overlay */
+#startScreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 100;
+  transition: opacity 0.5s;
+}
+
+#startScreen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#startScreen h1 {
+  font-size: clamp(2rem, 8vw, 4.5rem);
+  color: #fff;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+  margin-bottom: 0.2em;
+  text-align: center;
+  line-height: 1.1;
+}
+
+#startScreen .subtitle {
+  font-size: clamp(0.9rem, 3vw, 1.4rem);
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 2em;
+  text-align: center;
+  padding: 0 1em;
+}
+
+#startScreen .bike-art {
+  font-size: clamp(3rem, 12vw, 6rem);
+  margin-bottom: 0.5em;
+}
+
+#startBtn {
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  padding: 0.7em 2.5em;
+  border: none;
+  border-radius: 50px;
+  background: #ff6b6b;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.05em;
+}
+
+#startBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+#startBtn:active {
+  transform: scale(0.97);
+}
+
+.instructions {
+  margin-top: 1.5em;
+  color: rgba(255,255,255,0.7);
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 1.5em;
+}
+
+/* HUD */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  font-size: clamp(0.9rem, 3vw, 1.2rem);
+  color: #fff;
+  font-weight: bold;
+}
+
+#hud.active {
+  display: flex;
+}
+
+#hud .coins {
+  color: #ffd700;
+}
+
+#hud .distance {
+  color: #a8e6cf;
+}
+
+#hud .lives {
+  color: #ff6b6b;
+}
+
+/* Mobile Controls */
+#mobileControls {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: none;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 12px 16px 24px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+#mobileControls.active {
+  display: flex;
+}
+
+.ctrl-btn {
+  width: clamp(56px, 15vw, 80px);
+  height: clamp(56px, 15vw, 80px);
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.ctrl-btn:active, .ctrl-btn.pressed {
+  background: rgba(255,255,255,0.4);
+  border-color: #fff;
+}
+
+.ctrl-left {
+  display: flex;
+  gap: 10px;
+}
+
+/* Game Over Overlay */
+#gameOver {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  color: #fff;
+}
+
+#gameOver.active {
+  display: flex;
+}
+
+#gameOver h2 {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  margin-bottom: 0.3em;
+  color: #ff6b6b;
+}
+
+#gameOver .final-score {
+  font-size: clamp(1rem, 3.5vw, 1.5rem);
+  margin-bottom: 0.3em;
+  color: #ffd700;
+}
+
+#gameOver .final-distance {
+  font-size: clamp(0.9rem, 3vw, 1.2rem);
+  margin-bottom: 1.5em;
+  color: #a8e6cf;
+}
+
+#restartBtn {
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  padding: 0.7em 2.5em;
+  border: none;
+  border-radius: 50px;
+  background: #ff6b6b;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.15s;
+}
+
+#restartBtn:active {
+  transform: scale(0.97);
+}
+
+/* Pause button */
+#pauseBtn {
+  position: fixed;
+  top: 10px;
+  right: 16px;
+  z-index: 60;
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  font-size: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#pauseBtn.active {
+  display: flex;
+}
