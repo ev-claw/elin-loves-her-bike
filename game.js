@@ -188,6 +188,134 @@
     o2.stop(now + 0.46);
   }
 
+  // ─── Character Sounds ─────────────────────────────────────────────
+  // Ambient character audio cues — procedural, lightweight, and charming
+
+  let lastCharSoundFrame = 0; // global cooldown to prevent sound overlap
+  const CHAR_SOUND_COOLDOWN = 90; // minimum frames between any character sound
+
+  function canPlayCharSound() {
+    if (frameCount - lastCharSoundFrame < CHAR_SOUND_COOLDOWN) return false;
+    lastCharSoundFrame = frameCount;
+    return true;
+  }
+
+  function playCatSound() {
+    if (!audioCtx) return;
+    // Soft, cute "mew" — sine wave with pitch bend
+    const now = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(700 + Math.random() * 100, now);
+    o.frequency.exponentialRampToValueAtTime(900 + Math.random() * 200, now + 0.06);
+    o.frequency.exponentialRampToValueAtTime(500 + Math.random() * 80, now + 0.18);
+    g.gain.setValueAtTime(0.06, now);
+    g.gain.linearRampToValueAtTime(0.07, now + 0.04);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start(now);
+    o.stop(now + 0.22);
+  }
+
+  function playDogSound() {
+    if (!audioCtx) return;
+    // Short playful yap — noise burst + square wave bark
+    const now = audioCtx.currentTime;
+    playNoise(0.03, 0.04);
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(280 + Math.random() * 40, now);
+    o.frequency.exponentialRampToValueAtTime(180 + Math.random() * 30, now + 0.08);
+    g.gain.setValueAtTime(0.05, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start(now);
+    o.stop(now + 0.1);
+    // Second yip after short pause (50% chance)
+    if (Math.random() > 0.5) {
+      setTimeout(() => {
+        const o2 = audioCtx.createOscillator();
+        const g2 = audioCtx.createGain();
+        o2.type = 'square';
+        o2.frequency.setValueAtTime(320 + Math.random() * 50, audioCtx.currentTime);
+        o2.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.06);
+        g2.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        g2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        o2.connect(g2);
+        g2.connect(audioCtx.destination);
+        o2.start();
+        o2.stop(audioCtx.currentTime + 0.08);
+      }, 120);
+    }
+  }
+
+  function playRatSound() {
+    if (!audioCtx) return;
+    // Quick scurrying chirp — very high, very short
+    const now = audioCtx.currentTime;
+    for (let i = 0; i < 2; i++) {
+      const t = now + i * 0.07;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(2200 + Math.random() * 400, t);
+      o.frequency.exponentialRampToValueAtTime(1600 + Math.random() * 200, t + 0.04);
+      g.gain.setValueAtTime(0.04, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t);
+      o.stop(t + 0.05);
+    }
+  }
+
+  function playHedgehogSound() {
+    if (!audioCtx) return;
+    // Soft snuffling — filtered noise with low rumble
+    const now = audioCtx.currentTime;
+    const bufSize = audioCtx.sampleRate * 0.15;
+    const buffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    const filt = audioCtx.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.value = 600;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.04, now);
+    g.gain.linearRampToValueAtTime(0.05, now + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+    src.connect(filt);
+    filt.connect(g);
+    g.connect(audioCtx.destination);
+    src.start(now);
+  }
+
+  function playGrannySound() {
+    if (!audioCtx) return;
+    // Grumpy "tut-tut" muttering — low warbling tone
+    const now = audioCtx.currentTime;
+    for (let i = 0; i < 2; i++) {
+      const t = now + i * 0.12;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(220 + Math.random() * 30, t);
+      o.frequency.exponentialRampToValueAtTime(180 + Math.random() * 20, t + 0.08);
+      g.gain.setValueAtTime(0.04, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t);
+      o.stop(t + 0.1);
+    }
+  }
+
   // ─── Music — punchy chiptune with drums ────────────────────────────
   let musicInterval = null;
   let drumInterval = null;
@@ -1590,6 +1718,8 @@
       w: def.w,
       h: def.h,
       type: def.type,
+      hasSounded: false,
+      soundDelay: 30 + Math.floor(Math.random() * 50),
     });
   }
 
@@ -1624,6 +1754,8 @@
       type: isCat ? 'cat' : 'dog',
       w: isCat ? 22 : 28,
       h: isCat ? 26 : 18,
+      hasSounded: false,
+      soundDelay: 40 + Math.floor(Math.random() * 60),
     });
   }
 
@@ -1655,6 +1787,7 @@
     obstacles = [];
     coinItems = [];
     animals = [];
+    lastCharSoundFrame = 0;
     malis = [];
     particles = [];
     speedLines = [];
@@ -1865,12 +1998,23 @@
       if (malis[i].x < -60) malis.splice(i, 1);
     }
 
-    // Move obstacles
+    // Move obstacles & trigger ambient sounds
     for (let i = obstacles.length - 1; i >= 0; i--) {
       obstacles[i].x -= speed;
       if (obstacles[i].x < -50) {
         obstacles.splice(i, 1);
         continue;
+      }
+      // Ambient character sound when approaching (30% chance per obstacle)
+      const ob = obstacles[i];
+      if (!ob.hasSounded && ob.x < W - 40 && ob.x > 100) {
+        if (ob.soundDelay > 0) { ob.soundDelay--; }
+        else if (Math.random() < 0.3 && canPlayCharSound()) {
+          ob.hasSounded = true;
+          if (ob.type === 'rat') playRatSound();
+          else if (ob.type === 'hedgehog') playHedgehogSound();
+          else if (ob.type === 'oldperson') playGrannySound();
+        }
       }
       if (invincibleTimer <= 0) {
         const o = obstacles[i];
@@ -1929,10 +2073,20 @@
       }
     }
 
-    // Move animals
+    // Move animals & trigger sounds
     for (let i = animals.length - 1; i >= 0; i--) {
-      animals[i].x -= speed * 0.65;
-      if (animals[i].x < -50) animals.splice(i, 1);
+      const a = animals[i];
+      a.x -= speed * 0.65;
+      if (a.x < -50) { animals.splice(i, 1); continue; }
+      // Sound trigger: when on-screen, after random delay, with global cooldown
+      if (!a.hasSounded && a.x < W - 20 && a.x > 60) {
+        if (a.soundDelay > 0) { a.soundDelay--; }
+        else if (canPlayCharSound()) {
+          a.hasSounded = true;
+          if (a.type === 'cat') playCatSound();
+          else playDogSound();
+        }
+      }
     }
 
     // Babble
