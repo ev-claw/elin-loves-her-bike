@@ -621,6 +621,11 @@
 
   const GRAVITY = 0.58;
   const JUMP_FORCE = -11.5;
+  const AIR_TAP_FORCE = -6.5;     // weaker than full jump
+  const MAX_AIR_TAPS = 2;         // extra taps allowed mid-air
+  const AIR_TAP_COOLDOWN = 8;     // frames between air taps
+  let airTapsUsed = 0;
+  let airTapCooldown = 0;
 
   // World objects
   let obstacles = [];
@@ -1952,6 +1957,8 @@
     elin.jumping = false;
     elin.ducking = false;
     elin.tilt = 0;
+    airTapsUsed = 0;
+    airTapCooldown = 0;
     obstacles = [];
     coinItems = [];
     animals = [];
@@ -2085,15 +2092,30 @@
     }
 
     // ── Elin physics ──
+    if (airTapCooldown > 0) airTapCooldown--;
+
     if (jumpPressed && !elin.jumping) {
+      // Ground jump
       elin.vy = JUMP_FORCE;
       elin.jumping = true;
       elin.wasInAir = true;
+      airTapsUsed = 0;
       jumpPressed = false;
       playJumpSound();
       // Jump dust
       spawnParticles(elin.x + 5, GROUND_Y, 6, '#b2bec3', {
         speed: 2, upward: 1, life: 15, gravity: 0.1, size: 2,
+      });
+    } else if (jumpPressed && elin.jumping && airTapsUsed < MAX_AIR_TAPS && airTapCooldown <= 0) {
+      // Air burst tap – small upward boost
+      elin.vy = Math.min(elin.vy, 0) + AIR_TAP_FORCE;
+      airTapsUsed++;
+      airTapCooldown = AIR_TAP_COOLDOWN;
+      jumpPressed = false;
+      playJumpSound();
+      // Air tap feedback – small puff below the bike
+      spawnParticles(elin.x + 10, elin.y + elin.h, 4, '#dfe6e9', {
+        speed: 1.2, upward: -0.3, life: 10, gravity: 0.05, size: 1.5,
       });
     }
     jumpPressed = false;
@@ -2115,6 +2137,8 @@
       elin.vy = 0;
       elin.jumping = false;
       elin.wasInAir = false;
+      airTapsUsed = 0;
+      airTapCooldown = 0;
     }
 
     // Invincibility
